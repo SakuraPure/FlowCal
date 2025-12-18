@@ -1,0 +1,72 @@
+{
+  "calendar": {
+    "title": "日历",
+    "drag_to_schedule": "拖动任务到日历日期上或此处安排日程",
+    "heatmap_less": "少",
+    "heatmap_more": "多"
+  },
+  "inbox": "收集箱",
+  "focus": {
+    "title": "专注",
+    "pomo": "番茄",
+    "start": "开始",
+    "settings": "计时器设置",
+    "tasks_suffix": "个任务",
+    "focusing_now": "正在专注"
+  },
+  "search": "快速搜索...",
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统"
+  },
+  "view": {
+    "month": "月",
+    "week": "周",
+    "day": "日"
+  },
+  "tasks": {
+    "empty_inbox": "收件箱空空如也！🎉",
+    "add_task": "添加任务...",
+    "new_task": "新任务",
+    "no_events": "暂无日程",
+    "folders": "文件夹",
+    "lists": "列表",
+    "title": "任务",
+    "no_tasks_in_list": "此处暂无任务"
+  },
+  "common": {
+    "save": "保存",
+    "save_changes": "保存更改",
+    "delete": "删除",
+    "cancel": "取消"
+  },
+  "task_detail": {
+    "subtasks_related": "子任务 / 关联",
+    "parent": "父任务",
+    "no_subtasks": "无关联子任务",
+    "new_subtask_placeholder": "新子任务...",
+    "link_existing": "关联已有任务",
+    "select_task": "选择任务",
+    "no_available_tasks": "无可关联任务",
+    "tags": "标签",
+    "add_tag_placeholder": "添加标签",
+    "title_placeholder": "任务标题",
+    "delete_task": "删除任务",
+    "description": "描述",
+    "description_placeholder": "添加详细描述...",
+    "status": "状态",
+    "list": "列表",
+    "due_date": "截止日期",
+    "duration": "时长 (分钟)",
+    "assigned_dates": "安排日期",
+    "unschedule": "移除日程",
+    "no_dates": "未安排日期",
+    "status_todo": "待办",
+    "status_in_progress": "进行中",
+    "status_done": "已完成",
+    "priority_low": "低",
+    "priority_medium": "中",
+    "priority_high": "高"
+  }
+}

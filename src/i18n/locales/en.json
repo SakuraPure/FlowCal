@@ -1,0 +1,72 @@
+{
+  "calendar": {
+    "title": "Calendar",
+    "drag_to_schedule": "Drag tasks to the calendar or here to schedule",
+    "heatmap_less": "Less",
+    "heatmap_more": "More"
+  },
+  "inbox": "Inbox",
+  "focus": {
+    "title": "Focus",
+    "pomo": "Pomo",
+    "start": "Start",
+    "settings": "Timer Settings",
+    "tasks_suffix": "Tasks",
+    "focusing_now": "Focusing Now"
+  },
+  "search": "Quick search...",
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "view": {
+    "month": "Month",
+    "week": "Week",
+    "day": "Day"
+  },
+  "tasks": {
+    "empty_inbox": "Inbox Zero! 🎉",
+    "add_task": "Add a task...",
+    "new_task": "New Task",
+    "no_events": "No events scheduled",
+    "folders": "Folders",
+    "lists": "Lists",
+    "title": "Tasks",
+    "no_tasks_in_list": "No tasks in this list"
+  },
+  "common": {
+    "save": "Save",
+    "save_changes": "Save Changes",
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
+  "task_detail": {
+    "subtasks_related": "Subtasks / Related",
+    "parent": "Parent",
+    "no_subtasks": "No subtasks linked",
+    "new_subtask_placeholder": "New subtask...",
+    "link_existing": "Link Existing Task",
+    "select_task": "Select Task",
+    "no_available_tasks": "No available tasks",
+    "tags": "Tags",
+    "add_tag_placeholder": "Add tag",
+    "title_placeholder": "Task Title",
+    "delete_task": "Delete Task",
+    "description": "Description",
+    "description_placeholder": "Add detailed description...",
+    "status": "Status",
+    "list": "List",
+    "due_date": "Due Date",
+    "duration": "Duration (Min)",
+    "assigned_dates": "Assigned Dates",
+    "unschedule": "Unschedule",
+    "no_dates": "No dates assigned",
+    "status_todo": "To Do",
+    "status_in_progress": "In Progress",
+    "status_done": "Completed",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High"
+  }
+}
