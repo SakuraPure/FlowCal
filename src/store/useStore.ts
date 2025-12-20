@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import {
+  persist,
+  createJSONStorage,
+  type StateStorage,
+} from "zustand/middleware";
+import { get, set, del } from "idb-keyval";
 
 export type ViewMode = "month" | "week" | "day";
 
@@ -116,6 +121,22 @@ export interface ActiveTimer {
   phase: "work" | "short_break" | "long_break";
   cyclesCompleted: number;
 }
+
+// Custom storage object for idb-keyval
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    // console.log(name, "has been retrieved");
+    return (await get(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    // console.log(name, "with value", value, "has been saved");
+    await set(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    // console.log(name, "has been deleted");
+    await del(name);
+  },
+};
 
 export const useStore = create<AppState>()(
   persist<AppState>(
@@ -509,6 +530,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: "flow-cal-storage",
+      storage: createJSONStorage(() => storage),
       partialize: (state) =>
         ({
           tasks: state.tasks,
