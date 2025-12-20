@@ -42,28 +42,28 @@ export const TimerDisplay = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       className={clsx(
-        "flex flex-col items-center justify-center p-8 rounded-3xl backdrop-blur-xl border shadow-2xl transition-colors duration-500",
+        "flex flex-col items-center justify-center p-4 sm:p-8 h-full w-full rounded-3xl backdrop-blur-xl border shadow-2xl transition-colors duration-500 overflow-hidden",
         activeTimer.phase === 'short_break' || activeTimer.phase === 'long_break' 
           ? "bg-green-50/90 dark:bg-green-900/50 border-green-100 dark:border-green-800 shadow-green-500/10"
           : "bg-white/90 dark:bg-gray-900/90 border-white/50 dark:border-white/10 shadow-indigo-500/10"
       )}
     >
       <div className={clsx(
-        "text-sm font-bold mb-2 uppercase tracking-widest",
+        "text-xs sm:text-sm font-bold mb-1 sm:mb-2 uppercase tracking-widest",
          activeTimer.phase?.includes('break') ? "text-green-600 dark:text-green-400" : "text-indigo-500 dark:text-indigo-400"
       )}>
         {phaseLabel}
       </div>
       
-      <div className="text-gray-800 dark:text-gray-100 font-bold text-7xl font-mono tracking-tight mb-4 tabular-nums relative">
+      <div className="text-gray-800 dark:text-gray-100 font-bold text-5xl sm:text-7xl font-mono tracking-tight mb-2 sm:mb-4 tabular-nums relative">
         {timeString}
         {isPomodoro && remainingSeconds < 0 && (
-            <span className="absolute -top-4 -right-4 text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">Overtime</span>
+            <span className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 text-[10px] sm:text-xs font-bold text-red-500 bg-red-50 px-2 py-0.5 sm:py-1 rounded-full">Overtime</span>
         )}
       </div>
 
       {task && (
-        <div className="text-lg text-gray-600 dark:text-gray-400 font-medium mb-8 text-center max-w-sm truncate">
+        <div className="text-sm sm:text-lg text-gray-600 dark:text-gray-400 font-medium mb-4 sm:mb-8 text-center max-w-sm truncate px-4">
           {task.title}
         </div>
       )}

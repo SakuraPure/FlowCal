@@ -151,7 +151,7 @@ export const InboxPane = () => {
                     if (e.key === 'Enter') confirmAddFolder();
                     if (e.key === 'Escape') cancelAddFolder();
                   }}
-                  className="w-full text-xs border border-gray-200 rounded p-1.5 focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
+                  className="w-full text-xs border border-gray-200 rounded p-1.5 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
                   placeholder={t('tasks.add_task')} // "New List..."
                 />
               </div>
@@ -359,7 +359,7 @@ export const InboxPane = () => {
             value={newTaskTitle}
             onChange={(e) => setNewTaskTitle(e.target.value)}
             placeholder={t('tasks.add_task')}
-            className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 text-gray-900 dark:text-gray-100 transition-all placeholder-gray-400 dark:placeholder-gray-500"
+            className="w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800 border-none rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 text-gray-900 dark:text-gray-100 transition-all placeholder-gray-400 dark:placeholder-gray-500"
           />
           <button 
             type="submit"

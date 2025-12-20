@@ -3,7 +3,8 @@ import { Listbox, Transition } from '@headlessui/react';
 import { useStore, type Task } from '@/store/useStore';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { X, Trash2, Clock, CheckCircle2, Circle, Calendar, Flag, Tag, Plus, CheckSquare, Square, ChevronDown, ArrowLeft } from 'lucide-react';
+import { X, Trash2, Clock, CheckCircle2, Circle, Calendar, Flag, Tag, Plus, CheckSquare, Square, ChevronDown, ArrowLeft, Bell } from 'lucide-react';
+import { DatePicker } from '@/components/common/DatePicker';
 import { v4 as uuidv4 } from 'uuid';
 
 interface TaskDetailFormProps {
@@ -69,7 +70,7 @@ const SubtasksSection = ({
     };
 
     return (
-      <div className="flex flex-col h-full bg-gray-50/50 rounded-xl border border-gray-100 p-3 overflow-hidden">
+      <div className="flex flex-col h-full bg-gray-50/50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700/50 p-3 overflow-hidden">
         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex justify-between items-center">
             <span>{t('task_detail.subtasks_related')}</span>
             <span className="text-xs bg-gray-200 text-gray-600 px-1.5 rounded-full">{childTasks.length}</span>
@@ -79,7 +80,7 @@ const SubtasksSection = ({
         {parentTask && (
             <div 
                 onClick={() => onNavigate?.(parentTask.id)}
-                className="mb-3 p-2 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between group cursor-pointer hover:bg-blue-100 transition-colors"
+                className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 rounded-lg flex items-center justify-between group cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
                 title="Go to Parent Task"
             >
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -91,9 +92,9 @@ const SubtasksSection = ({
             </div>
         )}
 
-        <div className="flex-1 overflow-y-auto space-y-2 pr-1 -mr-1">
+        <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pr-1 -mr-1">
           {childTasks.map(st => (
-            <div key={st.id} className="group flex items-center gap-2 text-sm p-2 bg-white rounded-lg border border-gray-100 shadow-sm hover:border-blue-300 transition-colors">
+            <div key={st.id} className="group flex items-center gap-2 text-sm p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
               <button 
                 onClick={() => updateTask(st.id, { status: st.status === 'done' ? 'todo' : 'done' })}
                 className={clsx(
@@ -135,7 +136,7 @@ const SubtasksSection = ({
                     value={newSubtaskTitle}
                     onChange={(e) => setNewSubtaskTitle(e.target.value)}
                     placeholder={t('task_detail.new_subtask_placeholder')}
-                    className="flex-1 bg-transparent border-none text-sm focus:ring-0 p-0 placeholder-gray-400"
+                    className="flex-1 bg-transparent border-none text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-0 p-0 placeholder-gray-400"
                 />
             </form>
 
@@ -150,8 +151,8 @@ const SubtasksSection = ({
                          <Plus size={10} /> Link Existing Task
                      </button>
                  ) : (
-                     <div className="absolute bottom-0 left-0 right-0 bg-white border border-gray-200 shadow-lg rounded-lg p-1 z-10 max-h-40 overflow-y-auto">
-                         <div className="flex justify-between items-center px-2 py-1 border-b border-gray-50 mb-1">
+                     <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg p-1 z-10 max-h-40 overflow-y-auto">
+                         <div className="flex justify-between items-center px-2 py-1 border-b border-gray-50 dark:border-gray-700 mb-1">
                              <span className="text-[10px] font-bold text-gray-500">Select Task</span>
                              <button onClick={() => setIsLinking(false)}><X size={12} className="text-gray-400"/></button>
                          </div>
@@ -161,7 +162,7 @@ const SubtasksSection = ({
                              <button
                                 key={t.id}
                                 onClick={() => handleLinkTask(t.id)}
-                                className="w-full text-left px-2 py-1.5 text-xs text-gray-700 hover:bg-blue-50 rounded truncate"
+                                className="w-full text-left px-2 py-1.5 text-xs text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded truncate"
                              >
                                  {t.title}
                              </button>
@@ -202,12 +203,12 @@ const TagsSection = ({ tags, onChange }: { tags: string[], onChange: (tags: stri
           <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">{t('task_detail.tags')}</label>
           <div className="flex flex-wrap gap-2">
             {tags.map(tag => (
-              <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 text-blue-600 text-xs font-medium">
+              <span key={tag} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium">
                 {tag}
-                <button onClick={() => removeTag(tag)} className="hover:text-blue-800"><X size={12} /></button>
+                <button onClick={() => removeTag(tag)} className="hover:text-blue-800 dark:hover:text-blue-200"><X size={12} /></button>
               </span>
             ))}
-            <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+            <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <Tag size={12} className="text-gray-400" />
               <input
                 type="text"
@@ -215,7 +216,7 @@ const TagsSection = ({ tags, onChange }: { tags: string[], onChange: (tags: stri
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyDown={addTag}
                 placeholder={t('task_detail.add_tag_placeholder')}
-                className="bg-transparent border-none text-xs focus:ring-0 p-0 w-16 placeholder-gray-400"
+                className="bg-transparent border-none text-xs text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-0 p-0 w-16 placeholder-gray-400"
               />
             </div>
           </div>
@@ -243,7 +244,12 @@ export const TaskDetailForm = ({
   const [duration, setDuration] = useState<number | undefined>(undefined);
   const [priority, setPriority] = useState<Task['priority']>('medium');
   const [listId, setListId] = useState<string>('inbox');
+  const [startDate, setStartDate] = useState<string>('');
   const [dueDate, setDueDate] = useState<string>('');
+  // Reminder State: Only enabled if valid due date (handled in logic or UI).
+  // But wait, user requirement: "Without setting date range still can enable reminder. Fix this."
+  // So we must force disable/reset if dueDate is cleared.
+  const [reminder, setReminder] = useState<{ enabled: boolean; minutesBefore: number }>({ enabled: false, minutesBefore: 30 });
   const [tags, setTags] = useState<string[]>([]);
   // subtasks state removed (handled by derived props in SubtasksSection)
 
@@ -255,7 +261,10 @@ export const TaskDetailForm = ({
       setDuration(task.duration);
       setPriority(task.priority);
       setListId(task.listId);
+      setListId(task.listId);
+      setStartDate(task.startDate || '');
       setDueDate(task.dueDate || '');
+      setReminder(task.reminder || { enabled: false, minutesBefore: 30 });
       setTags(task.tags || []);
       // setSubtasks(task.subtasks || []); // Removed
     }
@@ -270,7 +279,9 @@ export const TaskDetailForm = ({
         duration,
         priority,
         listId,
+        startDate: startDate || undefined,
         dueDate: dueDate || undefined,
+        reminder,
         tags,
         // subtasks removed
       });
@@ -294,9 +305,9 @@ export const TaskDetailForm = ({
       <div className="relative">
         <Listbox.Button className={clsx(
           "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all border focus:outline-none focus:ring-2 focus:ring-offset-1",
-          status === 'done' ? "bg-green-50 text-green-700 border-green-200 focus:ring-green-500" :
-          status === 'in_progress' ? "bg-blue-50 text-blue-700 border-blue-200 focus:ring-blue-500" :
-          "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 focus:ring-gray-500"
+          status === 'done' ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 focus:ring-green-500" :
+          status === 'in_progress' ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 focus:ring-blue-500" :
+          "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-500"
         )}>
           {status === 'done' ? <CheckCircle2 size={14} /> : 
            status === 'in_progress' ? <Clock size={14} /> : 
@@ -315,7 +326,7 @@ export const TaskDetailForm = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-36 overflow-auto rounded-xl bg-white py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-36 overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-xs shadow-lg border border-gray-100 dark:border-gray-700 focus:outline-none">
             {[
               { value: 'todo', label: t('task_detail.status_todo'), icon: Circle, color: 'text-gray-500' },
               { value: 'in_progress', label: t('task_detail.status_in_progress'), icon: Clock, color: 'text-blue-500' },
@@ -326,7 +337,7 @@ export const TaskDetailForm = ({
                 className={({ active }) =>
                   clsx(
                     "relative cursor-pointer select-none py-2 pl-10 pr-4",
-                    active ? "bg-gray-50 text-gray-900" : "text-gray-900"
+                    active ? "bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100" : "text-gray-900 dark:text-gray-300"
                   )
                 }
                 value={option.value}
@@ -352,7 +363,7 @@ export const TaskDetailForm = ({
   const PriorityDropdown = () => (
     <Listbox value={priority} onChange={setPriority}>
       <div className="relative">
-        <Listbox.Button className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full text-xs font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+        <Listbox.Button className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all">
           <Flag size={14} className={clsx(
             priority === 'high' ? "text-red-500" : priority === 'medium' ? "text-orange-500" : "text-blue-500"
           )} />
@@ -365,7 +376,7 @@ export const TaskDetailForm = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-32 overflow-auto rounded-xl bg-white py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-32 overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-xs shadow-lg border border-gray-100 dark:border-gray-700 focus:outline-none">
             {['low', 'medium', 'high'].map((p) => (
               <Listbox.Option
                 key={p}
@@ -400,7 +411,7 @@ export const TaskDetailForm = ({
   const ListDropdown = () => (
     <Listbox value={listId} onChange={setListId}>
       <div className="relative">
-        <Listbox.Button className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full text-xs font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all max-w-[150px]">
+        <Listbox.Button className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full text-xs font-medium border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all max-w-[150px]">
           <span className="truncate block">{folders.find(f => f.id === listId)?.name === 'Inbox' ? t('inbox') : folders.find(f => f.id === listId)?.name || t('inbox')}</span>
           <ChevronDown size={12} className="text-gray-400 flex-shrink-0" />
         </Listbox.Button>
@@ -410,7 +421,7 @@ export const TaskDetailForm = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-40 overflow-auto rounded-xl bg-white py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-40 overflow-auto rounded-xl bg-white dark:bg-gray-800 py-1 text-xs shadow-lg border border-gray-100 dark:border-gray-700 focus:outline-none">
             {folders.map((f) => (
               <Listbox.Option
                 key={f.id}
@@ -453,14 +464,14 @@ export const TaskDetailForm = ({
       <div className="flex flex-wrap gap-2">
         {task.dates && task.dates.length > 0 ? (
           task.dates.map(date => (
-            <div key={date} className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium border border-blue-100">
+            <div key={date} className="flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-medium border border-blue-100 dark:border-blue-900/40">
               <span>{date}</span>
               <button 
                 onClick={() => {
                   const { removeFromDate } = useStore.getState();
                   removeFromDate(task.id, date);
                 }}
-                className="hover:text-blue-900"
+                className="hover:text-blue-900 dark:hover:text-blue-200"
               >
                 <X size={12} />
               </button>
@@ -490,21 +501,21 @@ export const TaskDetailForm = ({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-xl font-bold text-gray-900 border-none focus:ring-0 p-0 placeholder-gray-300 bg-transparent"
+              className="w-full text-xl font-bold text-gray-900 dark:text-gray-100 border-none focus:outline-none focus:ring-0 p-0 placeholder-gray-300 bg-transparent"
               placeholder={t('task_detail.title_placeholder')}
             />
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleDelete}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors"
               title={t('task_detail.delete_task')}
             >
               <Trash2 size={18} />
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-1.5 bg-black text-white rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors shadow-sm"
+              className="px-4 py-1.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-xs font-bold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm"
             >
               {t('common.save')}
             </button>
@@ -515,7 +526,7 @@ export const TaskDetailForm = ({
         <div className="flex-1 grid grid-cols-12 gap-6 min-h-0">
           
           {/* Column 1: Properties (41.6% -> 5 cols) */}
-          <div className="col-span-5 flex flex-col gap-2 border-r border-gray-100 pr-4 overflow-y-auto no-scrollbar">
+          <div className="col-span-5 flex flex-col gap-2 border-r border-gray-100 dark:border-gray-800 pr-4 pl-1 overflow-y-auto no-scrollbar">
             <div className="grid grid-cols-3 gap-3">
               {/* Sub-col 1: Status & Priority */}
               <div className="space-y-1">
@@ -537,8 +548,130 @@ export const TaskDetailForm = ({
 
             {/* Focus Actions - REMOVED per user request to move to Card */}
             
-            <div className="pt-2 border-t border-gray-50">
-              <AssignedDatesSection />
+            <div className="pt-2 border-t border-gray-50 dark:border-gray-800 space-y-4">
+               {/* Date Range: Split into Start and Due */}
+               <div className="grid grid-cols-2 gap-3">
+                   <div>
+                      <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.start_date')}</label>
+                      <DatePicker 
+                          value={startDate} 
+                          onChange={(d) => setStartDate(d || '')}
+                          maxDate={dueDate}
+                          placeholder={t('task_detail.start_date')}
+                          side="right"
+                      />
+                   </div>
+                   <div>
+                      <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.due_date')}</label>
+                      <DatePicker 
+                          value={dueDate} 
+                          onChange={(d) => {
+                              setDueDate(d || '');
+                              if (!d && reminder.enabled) {
+                                  setReminder(prev => ({ ...prev, enabled: false }));
+                              }
+                          }}
+                          minDate={startDate}
+                          placeholder={t('task_detail.due_date')}
+                          side="left"
+                      />
+                   </div>
+               </div>
+
+               <div className="grid grid-cols-2 gap-3">
+                   {/* Duration */}
+                   <div>
+                     <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.duration')}</label>
+                     <div className="relative">
+                       <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                       <input
+                         type="number"
+                         value={duration || ''}
+                         onChange={(e) => setDuration(Number(e.target.value))}
+                         className="w-full pl-9 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200 focus:border-blue-500 focus:outline-none focus:ring-blue-500 bg-gray-50/50 dark:bg-gray-800/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                         placeholder="30"
+                       />
+                     </div>
+                   </div>
+
+                    {/* Reminder */}
+                   <div>
+                       <div className="flex items-center justify-between mb-1">
+                           <label className="flex items-center gap-1 text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                               <Bell size={10} />
+                               {t('task_detail.reminders')}
+                           </label>
+                           <button 
+                               type="button"
+                               disabled={!dueDate}
+                               onClick={() => dueDate && setReminder(prev => ({ ...prev, enabled: !prev.enabled }))}
+                               className={clsx(
+                                   "relative inline-flex h-4 w-7 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                                   reminder.enabled ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700",
+                                   !dueDate && "opacity-50 cursor-not-allowed"
+                               )}
+                            >
+                               <span 
+                                   aria-hidden="true" 
+                                   className={clsx(
+                                       "pointer-events-none inline-block h-3 w-3 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                                       reminder.enabled ? "translate-x-3" : "translate-x-0"
+                                   )}
+                               />
+                            </button>
+                       </div>
+                       
+                       {reminder.enabled && (
+                           <div className="relative">
+                               <Listbox value={reminder.minutesBefore} onChange={(val) => setReminder(prev => ({ ...prev, minutesBefore: val }))}>
+                                    <Listbox.Button className="flex items-center gap-2 w-full p-1.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-xs text-gray-700 dark:text-gray-200 text-left focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                        <Clock size={14} className="text-blue-500" />
+                                        <span className="flex-1 truncate">
+                                           {[15, 30, 60, 1440, 2880].includes(reminder.minutesBefore) ? (
+                                               <>
+                                                   {reminder.minutesBefore === 15 && `15m`}
+                                                   {reminder.minutesBefore === 30 && `30m`}
+                                                   {reminder.minutesBefore === 60 && `1h`}
+                                                   {reminder.minutesBefore === 1440 && `1d`}
+                                                   {reminder.minutesBefore === 2880 && `2d`}
+                                               </>
+                                           ) : `${reminder.minutesBefore}m`}
+                                        </span>
+                                        <ChevronDown size={12} className="text-gray-400"/>
+                                    </Listbox.Button>
+                                    <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
+                                       <Listbox.Options className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden text-xs focus:outline-none">
+                                           {[
+                                               { val: 15, label: `15m` },
+                                               { val: 30, label: `30m` },
+                                               { val: 60, label: `1h` },
+                                               { val: 1440, label: `1d` },
+                                               { val: 2880, label: `2d` },
+                                           ].map(opt => (
+                                               <Listbox.Option
+                                                   key={opt.val}
+                                                   value={opt.val}
+                                                   className={({ active, selected }) => clsx(
+                                                       "cursor-pointer px-2 py-1.5 flex items-center justify-between",
+                                                       active ? "bg-gray-50 dark:bg-gray-700" : "",
+                                                       selected ? "text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-200"
+                                                   )}
+                                               >
+                                                   {({ selected }) => (
+                                                       <>
+                                                           <span>{opt.label}</span>
+                                                           {selected && <CheckCircle2 size={12} />}
+                                                       </>
+                                                   )}
+                                               </Listbox.Option>
+                                           ))}
+                                       </Listbox.Options>
+                                    </Transition>
+                               </Listbox>
+                           </div>
+                       )}
+                   </div>
+               </div>
             </div>
           </div>
 
@@ -548,7 +681,7 @@ export const TaskDetailForm = ({
              <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="flex-1 w-full rounded-xl border-gray-200 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 resize-none p-3 leading-relaxed"
+              className="flex-1 w-full rounded-xl border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200 focus:border-blue-500 focus:outline-none focus:ring-blue-500 bg-gray-50/50 dark:bg-gray-800/50 resize-none p-4 leading-relaxed"
               placeholder={t('task_detail.description_placeholder')}
             />
           </div>
@@ -563,7 +696,7 @@ export const TaskDetailForm = ({
                 onNavigate={onNavigate} 
               />
             </div>
-            <div className="flex-shrink-0 pt-2 border-t border-gray-50">
+            <div className="flex-shrink-0 pt-2 border-t border-gray-50 dark:border-gray-800">
               <TagsSection tags={tags} onChange={setTags} />
             </div>
           </div>
@@ -588,7 +721,7 @@ export const TaskDetailForm = ({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-xl font-bold text-gray-900 border-none focus:ring-0 p-0 placeholder-gray-300 bg-transparent"
+            className="w-full text-xl font-bold text-gray-900 dark:text-gray-100 border-none focus:outline-none focus:ring-0 p-0 placeholder-gray-300 bg-transparent"
             placeholder={t('task_detail.title_placeholder')}
           />
         </div>
@@ -601,14 +734,14 @@ export const TaskDetailForm = ({
 
       <div className="flex-1 overflow-y-auto pr-2 -mr-2">
         {/* Meta Row: Status, Priority, List */}
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-3 mb-6 p-1">
           <StatusDropdown />
           <PriorityDropdown />
           <ListDropdown />
         </div>
 
         {/* Body Content */}
-        <div className="space-y-5">
+        <div className="space-y-5 p-1">
           
           {/* Description */}
           <div>
@@ -616,29 +749,44 @@ export const TaskDetailForm = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full rounded-xl border-gray-200 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50 resize-none"
+              className="w-full rounded-xl border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200 focus:border-blue-500 focus:outline-none focus:ring-blue-500 bg-gray-50/50 dark:bg-gray-800/50 resize-none p-4"
               placeholder={t('task_detail.description_placeholder')}
             />
           </div>
 
           {/* Properties Grid */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Due Date */}
-            <div>
-              <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.due_date')}</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full pl-9 rounded-xl border-gray-200 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50"
-                />
-              </div>
+             {/* Date Range: Split into Start and Due */}
+            <div className="col-span-2 grid grid-cols-2 gap-4">
+                 <div>
+                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.start_date')}</label>
+                    <DatePicker 
+                        value={startDate} 
+                        onChange={(d) => setStartDate(d || '')}
+                        maxDate={dueDate}
+                        placeholder={t('task_detail.start_date')}
+                    />
+                 </div>
+                 <div>
+                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.due_date')}</label>
+                    <DatePicker 
+                        value={dueDate} 
+                        onChange={(d) => {
+                            setDueDate(d || '');
+                             // If due date is cleared, disable reminder
+                            if (!d && reminder.enabled) {
+                                setReminder(prev => ({ ...prev, enabled: false }));
+                            }
+                        }}
+                        minDate={startDate}
+                        placeholder={t('task_detail.due_date')}
+                        align="right"
+                    />
+                 </div>
             </div>
 
             {/* Duration */}
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wide">{t('task_detail.duration')}</label>
               <div className="relative">
                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -646,10 +794,91 @@ export const TaskDetailForm = ({
                   type="number"
                   value={duration || ''}
                   onChange={(e) => setDuration(Number(e.target.value))}
-                  className="w-full pl-9 rounded-xl border-gray-200 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 bg-gray-50/50"
+                  className="w-full pl-9 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200 focus:border-blue-500 focus:outline-none focus:ring-blue-500 bg-gray-50/50 dark:bg-gray-800/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="30"
                 />
               </div>
+            </div>
+
+             {/* Reminder */}
+            <div className="col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                    <label className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wide">
+                        <Bell size={12} />
+                        {t('task_detail.reminders')}
+                    </label>
+                    <div className="flex items-center gap-2">
+                         <span className="text-xs text-gray-500 dark:text-gray-400">{t('task_detail.enable_reminders')}</span>
+                         <button 
+                            type="button"
+                            disabled={!dueDate} // Disable if no due date
+                            onClick={() => dueDate && setReminder(prev => ({ ...prev, enabled: !prev.enabled }))}
+                            className={clsx(
+                                "relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                                reminder.enabled ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700",
+                                !dueDate && "opacity-50 cursor-not-allowed"
+                            )}
+                         >
+                            <span 
+                                aria-hidden="true" 
+                                className={clsx(
+                                    "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                                    reminder.enabled ? "translate-x-4" : "translate-x-0"
+                                )}
+                            />
+                         </button>
+                    </div>
+                </div>
+                
+                {reminder.enabled && (
+                    <div className="relative">
+                        <Listbox value={reminder.minutesBefore} onChange={(val) => setReminder(prev => ({ ...prev, minutesBefore: val }))}>
+                             <Listbox.Button className="flex items-center gap-2 w-full p-2 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-200 text-left focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                 <Clock size={16} className="text-blue-500" />
+                                 <span className="flex-1">
+                                    {[15, 30, 60, 1440, 2880].includes(reminder.minutesBefore) ? (
+                                        <>
+                                            {reminder.minutesBefore === 15 && `15 ${t('task_detail.reminder_unit_minutes')}`}
+                                            {reminder.minutesBefore === 30 && `30 ${t('task_detail.reminder_unit_minutes')}`}
+                                            {reminder.minutesBefore === 60 && `1 ${t('task_detail.reminder_unit_hours')}`}
+                                            {reminder.minutesBefore === 1440 && `1 ${t('task_detail.reminder_unit_days')}`}
+                                            {reminder.minutesBefore === 2880 && `2 ${t('task_detail.reminder_unit_days')}`}
+                                        </>
+                                    ) : `${reminder.minutesBefore} mins`}
+                                 </span>
+                                 <ChevronDown size={14} className="text-gray-400"/>
+                             </Listbox.Button>
+                             <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
+                                <Listbox.Options className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden text-sm focus:outline-none">
+                                    {[
+                                        { val: 15, label: `15 ${t('task_detail.reminder_unit_minutes')}` },
+                                        { val: 30, label: `30 ${t('task_detail.reminder_unit_minutes')}` },
+                                        { val: 60, label: `1 ${t('task_detail.reminder_unit_hours')}` },
+                                        { val: 1440, label: `1 ${t('task_detail.reminder_unit_days')}` },
+                                        { val: 2880, label: `2 ${t('task_detail.reminder_unit_days')}` },
+                                    ].map(opt => (
+                                        <Listbox.Option
+                                            key={opt.val}
+                                            value={opt.val}
+                                            className={({ active, selected }) => clsx(
+                                                "cursor-pointer px-3 py-2 flex items-center justify-between",
+                                                active ? "bg-gray-50 dark:bg-gray-700" : "",
+                                                selected ? "text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-200"
+                                            )}
+                                        >
+                                            {({ selected }) => (
+                                                <>
+                                                    <span>{opt.label}</span>
+                                                    {selected && <CheckCircle2 size={14} />}
+                                                </>
+                                            )}
+                                        </Listbox.Option>
+                                    ))}
+                                </Listbox.Options>
+                             </Transition>
+                        </Listbox>
+                    </div>
+                )}
             </div>
           </div>
 
@@ -666,7 +895,7 @@ export const TaskDetailForm = ({
       </div>
 
       {/* Footer */}
-      <div className="mt-4 flex justify-between items-center pt-4 border-t border-gray-50">
+      <div className="mt-4 flex justify-between items-center pt-4 border-t border-gray-50 dark:border-gray-800">
         <button
           onClick={handleDelete}
           className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium transition-colors"
@@ -676,7 +905,7 @@ export const TaskDetailForm = ({
         </button>
         <button
           onClick={handleSave}
-          className="px-6 py-2 bg-black text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
+          className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-lg shadow-gray-200 dark:shadow-none"
         >
           {t('common.save_changes')}
         </button>

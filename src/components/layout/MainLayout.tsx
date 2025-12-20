@@ -78,11 +78,24 @@ export const MainLayout = () => {
         } else {
           updateTask(activeId, { listId: folderId });
         }
-      } else {
+      } else if (overData?.type === 'calendar-day' || (typeof overId === 'string' && overId.startsWith('calendar:'))) {
         // Dropped on a day (Calendar)
-        const dateStr = overId;
+        const dateStr = overData?.date || overId.replace('calendar:', '');
         const { assignToDate } = useStore.getState();
         assignToDate(activeId, dateStr);
+      } else if (overData?.type === 'focus-panel' || overId === 'focus-panel-drop-target') {
+        // Dropped on Focus Panel (Schedule for Today/Current View)
+        const dateStr = overData?.date;
+        if (dateStr) {
+           const { assignToDate } = useStore.getState();
+           assignToDate(activeId, dateStr);
+        }
+      } else {
+        // Fallback for raw date IDs (if any remain) - Legacy support
+         if (typeof overId === 'string' && overId.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            const { assignToDate } = useStore.getState();
+            assignToDate(activeId, overId);
+         }
       }
     }
     

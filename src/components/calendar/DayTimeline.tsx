@@ -5,6 +5,7 @@ import { useScrollZoom } from '@/hooks/useScrollZoom';
 import { useRef } from 'react';
 import { useDateLocale } from '@/i18n/dateFns';
 import { useTranslation } from 'react-i18next';
+import { useDroppable } from '@dnd-kit/core';
 
 
 export const DayTimeline = () => {
@@ -14,6 +15,11 @@ export const DayTimeline = () => {
   const { currentDate, activeTimer, tasks, sessions } = useStore();
   const containerRef = useRef<HTMLDivElement>(null);
   useScrollZoom(containerRef);
+  
+  const { setNodeRef, isOver } = useDroppable({
+    id: `calendar:${format(currentDate, 'yyyy-MM-dd')}`,
+    data: { type: 'calendar-day', date: format(currentDate, 'yyyy-MM-dd') },
+  });
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const hourHeight = 80;
@@ -75,8 +81,14 @@ export const DayTimeline = () => {
       </div>
 
       {/* Timeline Container */}
-      <div ref={containerRef} className="flex-1 overflow-y-auto no-scrollbar relative bg-white dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-800/50 shadow-sm pt-4">
-        <div className="relative min-h-[1920px]"> {/* 24 * 80px */}
+      <div 
+        ref={containerRef} 
+        className={clsx(
+            "flex-1 overflow-y-auto no-scrollbar relative bg-white dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-800/50 shadow-sm pt-4 transition-colors",
+            isOver && "bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-300"
+        )}
+      >
+        <div ref={setNodeRef} className="relative min-h-[1920px]"> {/* 24 * 80px */}
             
             {/* Grid Background */}
             {hours.map((hour) => (

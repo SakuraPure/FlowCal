@@ -12,8 +12,8 @@ interface DroppableDayProps {
 export const DroppableDay = ({ date, children, className, onClick }: DroppableDayProps) => {
   const dateStr = format(date, 'yyyy-MM-dd');
   const { isOver, setNodeRef } = useDroppable({
-    id: dateStr,
-    data: { date: dateStr },
+    id: `calendar:${dateStr}`,
+    data: { type: 'calendar-day', date: dateStr },
   });
 
   return (

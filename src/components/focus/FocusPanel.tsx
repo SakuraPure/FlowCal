@@ -24,8 +24,8 @@ export const FocusPanel = () => {
   const isToday = isSameDay(currentDate, new Date());
 
   const { isOver, setNodeRef } = useDroppable({
-      id: dateStr, // Acts as a drop target for this specific date
-      data: { type: 'day', date: dateStr }
+      id: 'focus-panel-drop-target', 
+      data: { type: 'focus-panel', date: dateStr } // Acts as a drop target for current date
   });
 
   return (
@@ -119,18 +119,30 @@ export const FocusPanel = () => {
                     )}>
                       {task.title}
                     </h3>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        updateTask(task.id, { status: task.status === 'done' ? 'todo' : 'done' });
-                      }}
-                      className={clsx(
-                        "p-1 rounded-full transition-colors",
-                        task.status === 'done' ? "text-green-600 bg-green-50 dark:bg-green-900/30" : "text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                      )}
-                    >
-                      <CheckCircle size={18} className={task.status === 'done' ? "fill-current" : ""} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                removeFromDate(task.id, dateStr);
+                            }}
+                            className="p-1 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/40 transition-colors opacity-0 group-hover:opacity-100"
+                            title={t('task_detail.unschedule')}
+                        >
+                            <CalendarOff size={16} />
+                        </button>
+                        <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            updateTask(task.id, { status: task.status === 'done' ? 'todo' : 'done' });
+                        }}
+                        className={clsx(
+                            "p-1 rounded-full transition-colors",
+                            task.status === 'done' ? "text-green-600 bg-green-50 dark:bg-green-900/30" : "text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                        )}
+                        >
+                        <CheckCircle size={18} className={task.status === 'done' ? "fill-current" : ""} />
+                        </button>
+                    </div>
                   </div>
 
                   {/* Meta Info Row */}
@@ -232,16 +244,6 @@ export const FocusPanel = () => {
                             >
                                 <Play size={14} />
                                 {t('focus.start')}
-                            </button>
-                             <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeFromDate(task.id, dateStr);
-                                }}
-                                className="px-2 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
-                                title={t('task_detail.unschedule')}
-                            >
-                                <CalendarOff size={14} />
                             </button>
                         </div>
                     </div>

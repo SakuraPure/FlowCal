@@ -66,7 +66,7 @@ export const PomodoroSettingsModal = ({ isOpen, onClose }: PomodoroSettingsModal
                       step="5"
                       value={pomodoroSettings.workDuration}
                       onChange={(e) => updateSetting('workDuration', Number(e.target.value))}
-                      className="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      className="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none"
                     />
                   </div>
 
@@ -83,7 +83,7 @@ export const PomodoroSettingsModal = ({ isOpen, onClose }: PomodoroSettingsModal
                       step="1"
                       value={pomodoroSettings.shortBreakDuration}
                       onChange={(e) => updateSetting('shortBreakDuration', Number(e.target.value))}
-                      className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      className="w-full h-2 bg-blue-100 rounded-lg appearance-none cursor-pointer accent-blue-600 focus:outline-none"
                     />
                   </div>
 
@@ -100,7 +100,7 @@ export const PomodoroSettingsModal = ({ isOpen, onClose }: PomodoroSettingsModal
                       step="5"
                       value={pomodoroSettings.longBreakDuration}
                       onChange={(e) => updateSetting('longBreakDuration', Number(e.target.value))}
-                      className="w-full h-2 bg-purple-100 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                      className="w-full h-2 bg-purple-100 rounded-lg appearance-none cursor-pointer accent-purple-600 focus:outline-none"
                     />
                   </div>
                   

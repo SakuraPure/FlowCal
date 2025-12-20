@@ -32,7 +32,12 @@ export interface Task {
   listId: string; // Reference to Folder.id
   startDate?: string;
   dueDate?: string;
-  reminders?: string[];
+  reminder?: {
+    enabled: boolean;
+    minutesBefore: number;
+    // We could add 'type' if we want email/push later
+  };
+  reminders?: string[]; // @deprecated - migrating to single reminder object for now, or keep array if multiple needed. keeping simplistic as per request.
   priority: "low" | "medium" | "high";
   tags: string[];
   subtasks: Subtask[]; // @deprecated - migrating to parentId relationship
@@ -423,11 +428,59 @@ export const useStore = create<AppState>()(
       addTask: (task) =>
         set((state: AppState) => ({ tasks: [...state.tasks, task] })),
       updateTask: (taskId, updates) =>
-        set((state: AppState) => ({
-          tasks: state.tasks.map((t) =>
-            t.id === taskId ? { ...t, ...updates } : t
-          ),
-        })),
+        set((state: AppState) => {
+          let hasRangeUpdate = false;
+          let newDatesToAdd: string[] = [];
+
+          const currentTask = state.tasks.find((t) => t.id === taskId);
+          if (!currentTask) return {};
+
+          // Check if start/due dates are changing to valid non-empty values
+          const oldStart = currentTask.startDate;
+          const oldDue = currentTask.dueDate;
+          const newStart =
+            "startDate" in updates ? updates.startDate : oldStart;
+          const newDue = "dueDate" in updates ? updates.dueDate : oldDue;
+
+          // If both exist and are valid strings
+          if (newStart && newDue) {
+            // Basic validation: ensure logic runs if they are different from before OR if we just want to enforce it on every update that has these fields.
+            // We'll calculate the range.
+            const start = new Date(newStart);
+            const end = new Date(newDue);
+
+            if (
+              !isNaN(start.getTime()) &&
+              !isNaN(end.getTime()) &&
+              start <= end
+            ) {
+              // Generate dates
+              let loop = new Date(start);
+              while (loop <= end) {
+                newDatesToAdd.push(loop.toISOString().split("T")[0]);
+                loop.setDate(loop.getDate() + 1);
+              }
+              hasRangeUpdate = true;
+            }
+          }
+
+          return {
+            tasks: state.tasks.map((t) => {
+              if (t.id !== taskId) return t;
+
+              let updatedTask = { ...t, ...updates };
+
+              if (hasRangeUpdate) {
+                // UNION Update: Add new dates, keep existing ones.
+                const existingDates = new Set(updatedTask.dates || []);
+                newDatesToAdd.forEach((d) => existingDates.add(d));
+                updatedTask.dates = Array.from(existingDates).sort();
+              }
+
+              return updatedTask;
+            }),
+          };
+        }),
       deleteTask: (taskId) =>
         set((state: AppState) => ({
           tasks: state.tasks.filter((t) => t.id !== taskId),
