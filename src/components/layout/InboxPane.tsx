@@ -25,9 +25,44 @@ import { ThemeToggle } from '@/components/common/ThemeToggle';
 // import { LanguageToggle } from '@/components/common/LanguageToggle'; // Removed per user feedback
 import { useTranslation } from 'react-i18next';
 
+import { AuthDialog } from '@/components/auth/AuthDialog';
+import { supabase } from '@/lib/supabase';
+
 export const InboxPane = () => {
   const { t } = useTranslation();
-  const { tasks, addTask, currentFolderId, addFolder } = useStore();
+  const { tasks, addTask, currentFolderId, addFolder, user, setUser, syncFromSupabase } = useStore();
+  
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) syncFromSupabase();
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) syncFromSupabase();
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setUser, syncFromSupabase]);
+
+  const handleAuthClick = () => {
+      if (user) {
+          if (confirm("Sign out?")) {
+              supabase.auth.signOut();
+              setUser(null);
+          }
+      } else {
+          setIsAuthOpen(true);
+      }
+  };
+
+  // ... (existing code)
   
   // Filter tasks by current folder
   // Filter tasks by current folder
@@ -348,6 +383,16 @@ export const InboxPane = () => {
           </div>
           <div className="ml-2 flex items-center gap-2 flex-shrink-0">
             {/* LanguageToggle removed */}
+            <button 
+                onClick={handleAuthClick}
+                className={clsx(
+                    "p-2 rounded-full transition-colors",
+                    user ? "text-blue-500 bg-blue-50 dark:bg-blue-900/20" : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                )}
+                title={user ? `Signed in as ${user.email}` : "Sign In"}
+            >
+                <User size={20} />
+            </button>
             <ThemeToggle />
           </div>
         </div>
@@ -392,6 +437,14 @@ export const InboxPane = () => {
         onClose={handleCloseModal} 
         taskId={selectedTaskId}
         onNavigate={setSelectedTaskId}
+      />
+      
+      <AuthDialog 
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onSuccess={() => {
+            // Optional: Show success toast
+        }}
       />
     </div>
   );

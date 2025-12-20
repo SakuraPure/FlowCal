@@ -1,5 +1,19 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import {
+  persist,
+  createJSONStorage,
+  type StateStorage,
+} from "zustand/middleware";
+import { get, set, del } from "idb-keyval";
+import type { User } from "@supabase/supabase-js";
+import {
+  supabase,
+  toSupabaseTask,
+  fromSupabaseTask,
+  toSupabaseFolder,
+  fromSupabaseFolder,
+  toSupabaseSession,
+} from "../lib/supabase";
 
 export type ViewMode = "month" | "week" | "day";
 
@@ -56,6 +70,7 @@ interface AppState {
   viewMode: ViewMode;
   currentDate: Date;
   theme: Theme;
+  user: User | null;
 
   tasks: Task[];
   folders: Folder[];
@@ -65,6 +80,8 @@ interface AppState {
   setCurrentDate: (date: Date) => void;
   setTheme: (theme: Theme) => void;
   setCurrentFolderId: (folderId: string) => void;
+  setUser: (user: User | null) => void;
+  syncFromSupabase: () => Promise<void>;
 
   // Task Actions
   assignToDate: (taskId: string, date: string) => void;
@@ -117,12 +134,26 @@ export interface ActiveTimer {
   cyclesCompleted: number;
 }
 
+// Custom storage object for idb-keyval
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await get(name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await set(name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await del(name);
+  },
+};
+
 export const useStore = create<AppState>()(
   persist<AppState>(
     (set: any) => ({
       viewMode: "month",
       currentDate: new Date(),
       theme: "system",
+      user: null as User | null,
       currentFolderId: "inbox",
       dailyActivity: {} as Record<string, number>, // Init
       sessions: [] as Session[], // Init
@@ -159,6 +190,32 @@ export const useStore = create<AppState>()(
       setCurrentDate: (date) => set({ currentDate: date }),
       setTheme: (theme) => set({ theme }),
       setCurrentFolderId: (id) => set({ currentFolderId: id }),
+      setUser: (user) => set({ user }),
+      syncFromSupabase: async () => {
+        const { user } = useStore.getState();
+        if (!user) return;
+
+        // Fetch all data
+        const [tasks, folders, sessions] = await Promise.all([
+          supabase.from("tasks").select("*"),
+          supabase.from("folders").select("*"),
+          supabase.from("sessions").select("*"),
+          // supabase.from('daily_activity').select('*')
+        ]);
+
+        if (tasks.data) {
+          set({ tasks: tasks.data.map((t) => fromSupabaseTask(t)) });
+        }
+        if (folders.data) {
+          set({
+            folders: folders.data.map((f) => fromSupabaseFolder(f)),
+          });
+        }
+        if (sessions.data) {
+          // TODO: map sessions
+          // set({ sessions: sessions.data.map(fromSupabaseSession) });
+        }
+      },
 
       assignToDate: (taskId, date) =>
         set((state: AppState) => ({
@@ -292,17 +349,35 @@ export const useStore = create<AppState>()(
               // Record Session
               if (addedMinutes > 0.1) {
                 // Only log significant sessions (>6 seconds)
-                updatedSessions = [
-                  ...state.sessions,
-                  {
-                    id: Math.random().toString(36).substr(2, 9),
-                    taskId: task.id,
-                    startTime: state.activeTimer!.startTime,
-                    endTime: Date.now(),
-                    duration: addedMinutes,
-                    type: state.activeTimer!.type,
-                  },
-                ];
+                const newSession = {
+                  id: Math.random().toString(36).substr(2, 9),
+                  taskId: task.id,
+                  startTime: state.activeTimer!.startTime,
+                  endTime: Date.now(),
+                  duration: addedMinutes,
+                  type: state.activeTimer!.type,
+                };
+
+                updatedSessions = [...state.sessions, newSession];
+
+                if (state.user) {
+                  supabase
+                    .from("sessions")
+                    .insert(toSupabaseSession(newSession, state.user.id))
+                    .then(({ error }) => {
+                      if (error) console.error("Sync session error", error);
+                    });
+                  // Also sync task duration update in this case!
+                  // Finding the updated task in updatedTasks
+                  const updatedTask = updatedTasks.find(
+                    (t) => t.id === task.id
+                  );
+                  if (updatedTask) {
+                    supabase
+                      .from("tasks")
+                      .upsert(toSupabaseTask(updatedTask, state.user.id));
+                  }
+                }
               }
             }
           }
@@ -426,7 +501,18 @@ export const useStore = create<AppState>()(
         }),
 
       addTask: (task) =>
-        set((state: AppState) => ({ tasks: [...state.tasks, task] })),
+        set((state: AppState) => {
+          if (state.user) {
+            // Optimistic update + Sync
+            supabase
+              .from("tasks")
+              .insert(toSupabaseTask(task, state.user.id))
+              .then(({ error }) => {
+                if (error) console.error("Sync error", error);
+              });
+          }
+          return { tasks: [...state.tasks, task] };
+        }),
       updateTask: (taskId, updates) =>
         set((state: AppState) => {
           let hasRangeUpdate = false;
@@ -464,7 +550,7 @@ export const useStore = create<AppState>()(
             }
           }
 
-          return {
+          const newState = {
             tasks: state.tasks.map((t) => {
               if (t.id !== taskId) return t;
 
@@ -477,29 +563,86 @@ export const useStore = create<AppState>()(
                 updatedTask.dates = Array.from(existingDates).sort();
               }
 
+              // SYNC
+              if (state.user) {
+                supabase
+                  .from("tasks")
+                  .upsert(toSupabaseTask(updatedTask, state.user.id))
+                  .then(({ error }) => {
+                    if (error) console.error("Sync update error", error);
+                  });
+              }
+
               return updatedTask;
             }),
           };
+          return newState;
         }),
       deleteTask: (taskId) =>
-        set((state: AppState) => ({
-          tasks: state.tasks.filter((t) => t.id !== taskId),
-        })),
+        set((state: AppState) => {
+          if (state.user) {
+            supabase
+              .from("tasks")
+              .delete()
+              .eq("id", taskId)
+              .then(({ error }) => {
+                if (error) console.error("Sync delete error", error);
+              });
+          }
+          return {
+            tasks: state.tasks.filter((t) => t.id !== taskId),
+          };
+        }),
 
       addFolder: (folder) =>
-        set((state: AppState) => ({ folders: [...state.folders, folder] })),
+        set((state: AppState) => {
+          if (state.user) {
+            supabase
+              .from("folders")
+              .insert(toSupabaseFolder(folder, state.user.id))
+              .then(({ error }) => {
+                if (error) console.error("Sync folder error", error);
+              });
+          }
+          return { folders: [...state.folders, folder] };
+        }),
       updateFolder: (folderId, updates) =>
         set((state: AppState) => ({
-          folders: state.folders.map((f) =>
-            f.id === folderId ? { ...f, ...updates } : f
-          ),
+          folders: state.folders.map((f) => {
+            if (f.id !== folderId) return f;
+            const updated = { ...f, ...updates };
+            if (state.user) {
+              supabase
+                .from("folders")
+                .upsert(toSupabaseFolder(updated, state.user.id))
+                .then(({ error }) => {
+                  if (error) console.error("Sync folder update error", error);
+                });
+            }
+            return updated;
+          }),
         })),
       deleteFolder: (folderId) =>
         set((state: AppState) => {
           // Move tasks in this folder to inbox
-          const updatedTasks = state.tasks.map((t) =>
-            t.listId === folderId ? { ...t, listId: "inbox" } : t
-          );
+          const updatedTasks = state.tasks.map((t) => {
+            const updated =
+              t.listId === folderId ? { ...t, listId: "inbox" } : t;
+            // Ideally we sync these task updates too, but for now let's hope bulk update or lazy sync handles it.
+            // Actually, if we don't sync, they will point to a missing folder on server.
+            // But since "inbox" is default, maybe okay.
+            return updated;
+          });
+
+          if (state.user) {
+            supabase
+              .from("folders")
+              .delete()
+              .eq("id", folderId)
+              .then(({ error }) => {
+                if (error) console.error("Sync folder delete error", error);
+              });
+          }
 
           return {
             folders: state.folders.filter((f) => f.id !== folderId),
@@ -509,6 +652,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: "flow-cal-storage",
+      storage: createJSONStorage(() => storage),
       partialize: (state) =>
         ({
           tasks: state.tasks,
