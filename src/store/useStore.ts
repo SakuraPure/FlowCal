@@ -35,6 +35,7 @@ export interface Task {
 
   // Advanced Fields
   listId: string; // Reference to Folder.id
+  time?: string; // HH:mm (24h)
   startDate?: string;
   dueDate?: string;
   reminder?: {

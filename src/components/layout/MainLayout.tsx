@@ -80,9 +80,36 @@ export const MainLayout = () => {
         }
       } else if (overData?.type === 'calendar-day' || (typeof overId === 'string' && overId.startsWith('calendar:'))) {
         // Dropped on a day (Calendar)
-        const dateStr = overData?.date || overId.replace('calendar:', '');
-        const { assignToDate } = useStore.getState();
-        assignToDate(activeId, dateStr);
+        // overData should be robust: { type: 'time-slot', date: '...', time: '...' } OR { type: 'calendar-day', date: '...' }
+        const { updateTask, assignToDate } = useStore.getState();
+
+        if (overData?.type === 'time-slot') {
+             // Dropped on a specific time slot (Week View)
+             const dateStr = overData.date;
+             const timeStr = overData.time;
+             if (dateStr && timeStr) {
+                 updateTask(activeId, { dates: [dateStr], time: timeStr });
+             }
+        } else if (overData?.type === 'calendar-day' && overData.isAllDay) {
+             // Dropped on All Day section (Week View)
+             const dateStr = overData.date;
+             if (dateStr) {
+                updateTask(activeId, { dates: [dateStr], time: undefined });
+             }
+        } else {
+             // Fallback ID parsing (Month View or generic day drop)
+             const parts = overId.toString().split(':');
+             // calendar:YYYY-MM-DD:...
+             const dateStr = overData?.date || parts[1];
+             
+             // If we have an explicit date, assign to it. 
+             // Behavior: Use assignToDate to ADD/Ensure date (Month view logic)
+             // But if we are in Week view context (inferred from parts?), maybe we want single-date assignment?
+             // Sticking to existing logic: assignToDate for generic days.
+             if (dateStr) {
+                assignToDate(activeId, dateStr);
+             }
+        }
       } else if (overData?.type === 'focus-panel' || overId === 'focus-panel-drop-target') {
         // Dropped on Focus Panel (Schedule for Today/Current View)
         const dateStr = overData?.date;
