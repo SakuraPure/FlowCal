@@ -229,12 +229,12 @@ const DroppableTimeColumn = ({ day, tasks, taskLanes, slotHeights, slotTops, get
     const tasksWithStyle = tasks.map((task: any) => {
         const [h, m] = (task.time || '00:00').split(':').map(Number);
         const startMinutes = h * 60 + m;
-        const duration = task.duration || 30;
-        const endMinutes = startMinutes + duration;
+        // const duration = task.duration || 30; // Unused
+        // const endMinutes = startMinutes + duration; // Unused
         
         const top = getY(startMinutes);
-        const bottom = getY(endMinutes);
-        const height = bottom - top;
+        // const bottom = getY(endMinutes);
+        // const height = bottom - top; // Unused
         
         // Lane adjustment: if we are in a lane > 0, we can just flow? 
         // With 'expand to fit', the grid expansion already ensures there is vertical space.
