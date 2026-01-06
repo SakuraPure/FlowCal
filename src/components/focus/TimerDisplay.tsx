@@ -4,17 +4,33 @@ import { Play, Pause, Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
+import TimerWorker from '../../workers/timer.worker?worker';
+
 export const TimerDisplay = () => {
   const { activeTimer, pauseTimer, stopTimer, tickTimer, tasks } = useStore();
 
   useEffect(() => {
-    let interval: number;
+    let worker: Worker | null = null;
+
     if (activeTimer?.status === 'running') {
-      interval = window.setInterval(() => {
-        tickTimer();
-      }, 1000);
+      // Initialize Web Worker using Vite import
+      worker = new TimerWorker();
+      
+      worker.onmessage = (e) => {
+        if (e.data === 'tick') {
+          tickTimer();
+        }
+      };
+
+      worker.postMessage('start');
     }
-    return () => clearInterval(interval);
+
+    return () => {
+      if (worker) {
+        worker.postMessage('stop');
+        worker.terminate();
+      }
+    };
   }, [activeTimer?.status, tickTimer]);
 
   if (!activeTimer) return null;
